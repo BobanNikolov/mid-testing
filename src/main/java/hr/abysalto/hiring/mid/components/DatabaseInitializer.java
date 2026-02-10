@@ -1,43 +1,98 @@
 package hr.abysalto.hiring.mid.components;
 
+import hr.abysalto.hiring.mid.model.*;
+import hr.abysalto.hiring.mid.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Set;
+
 @Component
-public class DatabaseInitializer {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+@RequiredArgsConstructor
+public class DatabaseInitializer implements CommandLineRunner {
+	private final RoleRepository roleRepository;
+	private final UserAccountRepository userRepository;
+	private final CartRepository cartRepository;
+	private final CartItemRepository cartItemRepository;
+	private final ProductFavoriteRepository favoriteRepository;
+	private final PasswordEncoder passwordEncoder;
 
-	private boolean dataInitialized = false;
 
-	public boolean isDataInitialized() {
-		return this.dataInitialized;
+	@Override
+	public void run(String... args) throws Exception {
+//		initRoles();
+//		initUsers();
 	}
 
-	public void initialize() {
-		initTables();
-		initData();
-		this.dataInitialized = true;
+	private void initRoles() {
+		if (roleRepository.count() > 0) return;
+
+		Role userRole = Role.builder()
+				.name("ROLE_USER")
+				.build();
+
+		Role adminRole = Role.builder()
+				.name("ROLE_ADMIN")
+				.build();
+
+		roleRepository.saveAll(List.of(userRole, adminRole));
 	}
 
-	private void initTables() {
-		this.jdbcTemplate.execute("""
-			 CREATE TABLE buyer (
-				 buyer_id INT auto_increment PRIMARY KEY,
-				 first_name varchar(100) NOT NULL,
-				 last_name varchar(100) NOT NULL,
-				 title varchar(100) NULL
-			 );
- 		""");
+	private void initUsers() {
+		if (userRepository.count() > 0) return;
 
-	}
+		Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow();
 
-	private void initData() {
-		this.jdbcTemplate.execute("INSERT INTO buyer (first_name, last_name, title) VALUES ('Jabba', 'Hutt', 'the')");
-		this.jdbcTemplate.execute("INSERT INTO buyer (first_name, last_name, title) VALUES ('Anakin', 'Skywalker', NULL)");
-		this.jdbcTemplate.execute("INSERT INTO buyer (first_name, last_name, title) VALUES ('Jar Jar', 'Binks', NULL)");
-		this.jdbcTemplate.execute("INSERT INTO buyer (first_name, last_name, title) VALUES ('Han', 'Solo', NULL)");
-		this.jdbcTemplate.execute("INSERT INTO buyer (first_name, last_name, title) VALUES ('Leia', 'Organa', 'Princess')");
+		UserAccount user = UserAccount.builder()
+				.username("john")
+				.password(passwordEncoder.encode("password"))
+				.firstName("John")
+				.lastName("Doe")
+				.displayName("John Doe")
+				.roles(Set.of(userRole))
+				.build();
+
+		user = userRepository.save(user);
+
+		// Cart
+		Cart cart = Cart.builder()
+				.user(user)
+				.build();
+
+		cart = cartRepository.save(cart);
+		user.setCart(cart);
+
+		// Cart items (DummyJSON product IDs)
+		CartItem item1 = CartItem.builder()
+				.cart(cart)
+				.productId(1L)
+				.quantity(2)
+				.build();
+
+		CartItem item2 = CartItem.builder()
+				.cart(cart)
+				.productId(5L)
+				.quantity(1)
+				.build();
+
+		cartItemRepository.saveAll(List.of(item1, item2));
+
+		// Favorites
+		ProductFavorite favorite1 = ProductFavorite.builder()
+				.user(user)
+				.productId(3L)
+				.build();
+
+		ProductFavorite favorite2 = ProductFavorite.builder()
+				.user(user)
+				.productId(7L)
+				.build();
+
+		favoriteRepository.saveAll(List.of(favorite1, favorite2));
 	}
 }

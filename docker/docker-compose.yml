@@ -1,0 +1,14 @@
+version: '3.8'
+
+name: abysalto
+services:
+  abys-db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: abysdb
+      POSTGRES_USER: abys
+      POSTGRES_PASSWORD: abys
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./db-init-scripts:/docker-entrypoint-initdb.d/ # Initializes the database with scripts

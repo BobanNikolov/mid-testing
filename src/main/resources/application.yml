@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: java.mid
+  datasource:
+    url: jdbc:postgresql://localhost:5435/abysdb
+    username: abys
+    password: abys
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 25
+      idle-timeout: 30000
+  flyway:
+    enabled: true
+    # baseline-on-migrate: true
+    schemas: abys
+
+logging:
+  register-shutdown-hook: true
+  level:
+    root: info
+    hr.abysalto.hiring.mid: debug
