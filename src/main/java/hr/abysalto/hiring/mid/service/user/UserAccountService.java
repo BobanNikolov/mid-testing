@@ -19,4 +19,6 @@ public interface UserAccountService {
   void saveInitialUser(UserAccountCommand userAccountCommand);
 
   List<UserAccountDto> getAll();
+
+  UserAccountDto getCurrentUser();
 }

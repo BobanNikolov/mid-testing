@@ -6,9 +6,11 @@ import hr.abysalto.hiring.mid.service.user.UserAccountService;
 import hr.abysalto.hiring.mid.service.user.dto.UserAccountCommand;
 import hr.abysalto.hiring.mid.service.user.dto.UserAccountDto;
 import hr.abysalto.hiring.mid.service.user.merger.UserAccountCommandToEntityMerger;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -108,6 +110,23 @@ public class UserAccountServiceImpl implements UserAccountService {
         .toList();
     LOGGER.debug("getAll - END - result: {}", result);
     return result;
+  }
+
+  @Override
+  public UserAccountDto getCurrentUser() {
+    LOGGER.debug("getCurrentUser - START");
+
+    UserAccount user = (UserAccount) SecurityContextHolder.getContext()
+        .getAuthentication()
+        .getPrincipal();
+
+    LOGGER.debug("getCurrentUser - retrieved user from context: {}", user);
+
+    UserAccountDto userAccountDto = conversionService.convert(user, UserAccountDto.class);
+
+    LOGGER.debug("getCurrentUser - converted user: {}", userAccountDto);
+
+    return userAccountDto;
   }
 
 }

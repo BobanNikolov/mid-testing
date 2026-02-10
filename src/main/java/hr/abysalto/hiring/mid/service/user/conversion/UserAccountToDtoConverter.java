@@ -6,6 +6,10 @@ import hr.abysalto.hiring.mid.service.user.dto.UserAccountDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @Component
 public class UserAccountToDtoConverter implements Converter<UserAccount, UserAccountDto> {
 
@@ -22,7 +26,7 @@ public class UserAccountToDtoConverter implements Converter<UserAccount, UserAcc
         .firstName(source.getFirstName())
         .lastName(source.getLastName())
         .displayName(source.getDisplayName())
-        .roles(source.getRoles().stream()
+        .roles(isEmpty(source.getRoles()) ? new ArrayList<>() : source.getRoles().stream()
             .map(Role::getAuthority)
             .toList())
         .build();

@@ -19,3 +19,19 @@ logging:
   level:
     root: info
     hr.abysalto.hiring.mid: debug
+
+token:
+  secret: 48a868a4042f634ac04a117f00a87202131dd7c46c4b32c4acb3edc5e15f4511
+  expirationMs: 86400000
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+      dummyjson:
+        connectTimeout: 10000
+        readTimeout: 10000
+        loggerLevel: full

@@ -17,8 +17,6 @@ public class SignUpRequest {
   private String firstName;
   @Schema(description = "Last name of a user", example = "Doe")
   private String lastName;
-  @Schema(description = "Email of a user", example = "john.doe@gmail.com")
-  private String email;
   @Schema(description = "Username of a user", example = "johndoe")
   private String username;
   @Schema(description = "Password of a user", example = "test123")
